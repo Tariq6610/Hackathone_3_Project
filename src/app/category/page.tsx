@@ -11,6 +11,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet"
+import { Slider } from "@/components/ui/slider"
 import { UseproductsContext } from '@/components/context/ProductsContext'
 import { Product } from '@/types/Product'
 import { client } from '@/sanity/lib/client'
@@ -22,7 +23,7 @@ import ColorsSkeleton from '@/components/skeletons/ColorsSkeleton'
 import SizesSkeleton from '@/components/skeletons/SizesSkeleton'
 
 const Page = () => {
-const {searchFilter} = UseproductsContext();
+const {searchFilter, setAllProducts : setAllProductsOfProductContext} = UseproductsContext();
 const [isOpen, setIsOpen] = useState(false);
 
 const [allProducts, setAllProducts] = useState<Product[]>([])
@@ -33,11 +34,14 @@ const [stateColor, setStateColor] = useState("")
 const [stateSize, setStateSize] = useState("")
 const [stateCategory, setStateCategory] = useState("")
 const [filteredProducts, setFilteredProducts] = useState<Product[]>([])
+const [allAvailbleMinAndMaxPrices, setallAvailbleMinAndMaxPrices] = useState<[number, number] | null>(null)
+const [range, setRange] = useState<[number, number]>([0,0])
 const [filters, setFilters] = useState({
   name: "",
   category : "",
   color : "",
   size : "",
+  priceRange : [0,0] as [number, number]
 })
 
 
@@ -48,7 +52,8 @@ function filterProducts(){
     const filterByCategory = filters.category !== '' ? filterBySearch.filter(product=> product.category === filters.category) : filterBySearch;
     const filterByColor = filters.color !== '' ? filterByCategory.filter(product => product.colors.includes(filters.color)) : filterByCategory;
     const filterBySize = filters.size !== '' ? filterByColor.filter(product => product.sizes.includes(filters.size)) : filterByColor;
-    setFilteredProducts(filterBySize)
+    const filterByPrice = (filters.priceRange[0] !== 0 && filters.priceRange[1]) ? (filterBySize.filter(product => product.price > filters.priceRange[0] && product.price < filters.priceRange[1])) : filterBySize;
+    setFilteredProducts(filterByPrice)
 }
 
 
@@ -84,16 +89,19 @@ function handleSearch(){
 
       // Update state
       setAllProducts(allProducts);
+      setAllProductsOfProductContext(allProducts);
       
           if(allProducts.length !== 0){
             function getCategories(){
               const allAvaibleTypes = Array.from( new Set(allProducts.map((product)=> product.category))) 
               const allAvaibleColors = Array.from( new Set(allProducts.map((product)=> product.colors.map(color => color)).flat()))
               const allAvaibleSizes = Array.from( new Set(allProducts.map((product)=> product.sizes.map(size => size)).flat()))
-
+              const allAvaiblePrices = Array.from(new Set(allProducts.map((product)=>product.price)))
               setAllAvaibleTypes(allAvaibleTypes)
               setAllAvaibleColors(allAvaibleColors)
               setAllAvaibleSizes(allAvaibleSizes)
+              setallAvailbleMinAndMaxPrices([Math.min(...allAvaiblePrices), Math.max(...allAvaiblePrices)])
+              setRange([Math.min(...allAvaiblePrices), Math.max(...allAvaiblePrices)])
             }
             getCategories()
           }
@@ -114,8 +122,6 @@ function handleSearch(){
   useEffect(()=>{
     filterProducts();
     // handleSearch();
-    console.log(filters)
-    console.log(searchFilter)
 
   },[allProducts, filters, searchFilter])
 
@@ -128,11 +134,12 @@ function handleSearch(){
         name: searchFilter,
         category:stateCategory,
         color:stateColor,
-        size:stateSize
+        size:stateSize,
+        priceRange : range
       }
       
     ))
-  },[stateColor, stateSize, stateCategory, searchFilter])
+  },[stateColor, stateSize, stateCategory, searchFilter, range])
 
 
   return (
@@ -181,10 +188,28 @@ function handleSearch(){
                   alt=""
                 />
               </div>
-              <img src="/home/Group 6.png" alt="" />
-              <div className="flex justify-between px-[37px] font-bold">
-                <p>50%</p>
-                <p>200%</p>
+              {allAvailbleMinAndMaxPrices && (
+                <Slider
+                  defaultValue={[
+                    range[0],
+                    range[1],
+                  ]}
+                  max={allAvailbleMinAndMaxPrices[1]}
+                  min={allAvailbleMinAndMaxPrices[0]}
+                  step={1}
+                  onValueChange={(range) => {
+                    const [minVal, maxVal] = range;
+                    setRange([minVal, maxVal]);
+                  }}
+                />
+              )}
+              <div className="flex justify-between  font-bold">
+                {range && (
+                  <>
+                    <p>Min : {range[0]}$</p>
+                    <p>Max : {range[1]}$</p>
+                  </>
+                )}
               </div>
               <hr />
               <div className="flex items-center justify-between">
@@ -330,10 +355,28 @@ function handleSearch(){
                             alt=""
                           />
                         </div>
-                        <img src="/home/Group 6.png" alt="" />
-                        <div className="flex justify-between px-[37px] font-bold">
-                          <p>50%</p>
-                          <p>200%</p>
+                        {allAvailbleMinAndMaxPrices && (
+                          <Slider
+                            defaultValue={[
+                              range[0],
+                              range[1],
+                            ]}
+                            max={allAvailbleMinAndMaxPrices[1]}
+                            min={allAvailbleMinAndMaxPrices[0]}
+                            step={1}
+                            onValueChange={(range) => {
+                              const [minVal, maxVal] = range;
+                              setRange([minVal, maxVal]);
+                            }}
+                          />
+                        )}
+                        <div className="flex justify-between  font-bold">
+                          {range && (
+                            <>
+                              <p>Min : {range[0]}$</p>
+                              <p>Max : {range[1]}$</p>
+                            </>
+                          )}
                         </div>
                         <hr />
                         <div className="flex items-center justify-between">
@@ -438,7 +481,9 @@ function handleSearch(){
                     />
                   ))
                 ) : allProducts.length !== 0 ? (
-                  <div className='w-full flex justify-center items-center h-[100px] bg-gray-300'>No Product availble</div>
+                  <div className="w-full flex justify-center items-center h-[100px] bg-gray-300">
+                    No Product availble
+                  </div>
                 ) : (
                   Array(6)
                     .fill(0)

@@ -82,9 +82,9 @@ const CartContextProvider : FC<{children : ReactNode}> = ({children} ) => {
  function handleTotalPrice(){
    const deliveryFee = 15;
    const productsPrice = cart.map((product) => (product.price - (product.price * product.discountPercent/100)) * product.amount)
-   const totalPrice = productsPrice.reduce((prev, curr) => prev + curr, 0)
-   const discount = totalPrice * 20/100
-   const totalNetPrice = totalPrice - discount + deliveryFee
+   const totalPrice = Number(productsPrice.reduce((prev, curr) => prev + curr, 0).toFixed(2))
+   const discount = Number((totalPrice * 20/100).toFixed(2))
+   const totalNetPrice = Number((totalPrice - discount + deliveryFee).toFixed(2))
    settotalCostPrice(totalPrice)
    setNetPrice(totalNetPrice)
    setDiscount(discount)

@@ -2,6 +2,7 @@
 import React from 'react'
 import { useCartContext} from '@/components/context/CartContext'
 import CartItem from '@/components/CartItem'
+import Link from 'next/link'
 
 const Page = () => {
     const {cart, totalCostPrice, netPrice, discount} = useCartContext()
@@ -43,7 +44,7 @@ const Page = () => {
                     <input type="text" placeholder='Add Promo Code' name="" id="" />
                     <button className='w-[119px] h-[48px] rounded-[62px] flex justify-center items-center text-white bg-black'>Apply</button>
                 </div>
-                <button className='md:w-[457px] w-full h-[60px] bg-black flex justify-center items-center text-white rounded-[30px] sm:rounded-[62px]'>Go to Checkout</button>
+                <Link href='/checkout'><button className='md:w-[457px] w-full h-[60px] bg-black flex justify-center items-center text-white rounded-[30px] sm:rounded-[62px]'>Go to Checkout</button></Link>
             </div>
         </div>
     </div>

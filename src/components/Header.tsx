@@ -14,6 +14,7 @@ import { useCartContext } from './context/CartContext';
 import {useState } from 'react';
 import { UseproductsContext } from './context/ProductsContext';
 import { useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation'
 import {
   Select,
   SelectContent,
@@ -21,21 +22,53 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { Link as ScrollLink } from "react-scroll";
+import { Link as ScrollLink } from "react-scroll"
+import { scroller } from 'react-scroll';
 
 
 const Header = () => {
-  const router = useRouter();
- const {cart} = useCartContext()
- const {searchFilter, setSearchFilter} = UseproductsContext()
- const [crossClicked, setcrossClicked] = useState(false)
- const [isOpen, setIsOpen] = useState(false);
+const router = useRouter();
+const pathname = usePathname()
+const isHome = pathname === '/';
+const {cart} = useCartContext()
+const {searchFilter, setSearchFilter} = UseproductsContext()
+const [crossClicked, setcrossClicked] = useState(false)
+const [isOpen, setIsOpen] = useState(false);
 
 
  function goToCategoriesPage(){
     setIsOpen(false)
-    router.push('/category')
+    setTimeout(()=>{
+      router.push('/category')
+    },500)
  }
+
+ function goToHomePage(){
+  router.push('/')
+ }
+
+function navigateTo(targetedSection : string){
+  setIsOpen(false);
+  if(isHome){
+    scroller.scrollTo(targetedSection,{
+      duration: 500,
+      smooth: true,
+      offset: -70
+    })
+  }else{
+    setTimeout(()=>{
+      router.push('/');
+    },500)
+    setTimeout(()=>{
+      scroller.scrollTo(targetedSection,{
+        duration: 500,
+        smooth: true,
+        offset: -70
+      })
+    },1000)
+  }
+}
+
   return (
     <>
       {crossClicked === false && (
@@ -130,32 +163,11 @@ const Header = () => {
                           <SelectItem value="Gym">Gym</SelectItem>
                         </SelectContent>
                       </Select>
-                      <ScrollLink
-                        to="onSaleSection"
-                        smooth={true}
-                        duration={500}
-                        offset={-70}
-                      >
-                        <li onClick={() => setIsOpen(false)} className="w-[64px] cursor-pointer">On Sale</li>
-                      </ScrollLink>
-                      <ScrollLink
-                        to="NewArrivalSection"
-                        smooth={true}
-                        duration={500}
-                        offset={-70}
-                      >
-                        <li onClick={() => setIsOpen(false)} className="w-[90px] cursor-pointer">
+                        <li onClick={() =>  {navigateTo('onSaleSection')}} className="w-[64px] cursor-pointer">On Sale</li>
+                        <li onClick={() =>  {navigateTo("NewArrivalSection")}} className="w-[90px] cursor-pointer">
                           New Arrivals
                         </li>
-                      </ScrollLink>
-                      <ScrollLink
-                        to="brandsSection"
-                        smooth={true}
-                        duration={500}
-                        offset={-70}
-                      >
-                        <li onClick={() => setIsOpen(false)} className="w-[60px] cursor-pointer">Browse</li>
-                      </ScrollLink>
+                        <li onClick={() => {navigateTo("brandsSection")}} className="w-[60px] cursor-pointer">Browse</li>
                     </ul>
                   </SheetContent>
                 </Sheet>
@@ -176,36 +188,15 @@ const Header = () => {
                   <SelectItem value="Gym">Gym</SelectItem>
                 </SelectContent>
               </Select>
-              <ScrollLink
-                to="onSaleSection"
-                smooth={true}
-                duration={500}
-                offset={-70}
-              >
-                <li className="w-[64px] cursor-pointer">On Sale</li>
-              </ScrollLink>
-              <ScrollLink
-                to="NewArrivalSection"
-                smooth={true}
-                duration={500}
-                offset={-70}
-              >
-                <li className="w-[90px] cursor-pointer">New Arrivals</li>
-              </ScrollLink>
-              <ScrollLink
-                to="brandsSection"
-                smooth={true}
-                duration={500}
-                offset={-70}
-              >
-                <li className="w-[60px] cursor-pointer">Browse</li>
-              </ScrollLink>
+                <li onClick={() =>  {navigateTo('onSaleSection')}} className="w-[64px] cursor-pointer underline-offset-4 hover:underline">On Sale</li>
+                <li onClick={() =>  {navigateTo("NewArrivalSection")}} className="w-[90px] cursor-pointer underline-offset-4 hover:underline">New Arrivals</li>
+                <li onClick={() => {navigateTo("brandsSection")}} className="w-[60px] cursor-pointer underline-offset-4 hover:underline">Browse</li>
             </ul>
             <div className="sm:flex hidden gap-[14px] xl:gap-[24px] items-center ">
               <div className="flex items-center">
                 <Link href="/category">
                   <img
-                    className="object-contain"
+                    className="object-contain hover:scale-110"
                     src="/home/search.png"
                     alt="search"
                   />
@@ -226,7 +217,7 @@ const Header = () => {
                 <div className="relative">
                   <Link href="/cart">
                     <img
-                      className="object-contain min-w-[24px]"
+                      className="object-contain min-w-[24px] hover:scale-110"
                       src="/home/cart.png"
                       alt=""
                     />

@@ -10,9 +10,10 @@ interface Props{
 
 const CartItem = ({product}: Props) => {
   const {removeProduct, incrementAmount, decrementAmount} = useCartContext()
+  const netCost = product.price - (product.price * product.discountPercent/100)
   return (
     <>
-      <div className="flex sm:flex-row flex-col">
+      <div className="flex gap-3 sm:flex-row flex-col">
         <div className="sm:w-[124px] sm:h-[124px] overflow-hidden h-auto w-auto">
           <Link href={`product/${product._id}`}>
           <Image
@@ -34,7 +35,7 @@ const CartItem = ({product}: Props) => {
             <p>Color: {product.color}</p>
           </div>
           <div className="flex justify-between items-center">
-            <h1 className="font-bold text-[24px]">${product.price}</h1>
+            <h1 className="font-bold text-[24px]">${netCost}</h1>
             <div className="flex py-[12px] px-[20px] gap-[20px]">
               <button onClick={() => decrementAmount(product._id)} className='w-6 h-6 rounded-lg border border-gray-500 flex justify-center items-center cursor-pointer  transition-transform duration-100 active:scale-90 text-xl'><span className='w-full h-full flex justify-center items-center'>-</span></button>
               <p>{product.amount}</p>
