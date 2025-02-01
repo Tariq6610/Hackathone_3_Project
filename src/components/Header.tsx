@@ -22,7 +22,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { Link as ScrollLink } from "react-scroll"
 import { scroller } from 'react-scroll';
 
 
@@ -43,9 +42,6 @@ const [isOpen, setIsOpen] = useState(false);
     },500)
  }
 
- function goToHomePage(){
-  router.push('/')
- }
 
 function navigateTo(targetedSection : string){
   setIsOpen(false);
